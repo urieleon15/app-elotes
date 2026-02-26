@@ -2,70 +2,109 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Negocio de Elotes 🌽</title>
+
 <style>
 body {
-    font-family: Arial;
-    text-align: center;
+    font-family: Arial, sans-serif;
     background-color: #111;
     color: white;
+    margin: 0;
+    padding: 10px;
 }
+
+h2 {
+    text-align: center;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
 button {
-    width: 90%;
-    padding: 20px;
-    margin: 8px;
-    font-size: 20px;
+    width: 100%;
+    padding: 18px;
+    margin: 6px 0;
+    font-size: 18px;
     border-radius: 10px;
     border: none;
+    cursor: pointer;
 }
+
 .producto { background-color: #2ecc71; }
 .combo { background-color: #e67e22; }
 .control { background-color: #3498db; }
+.config { background-color: #555; }
+
 .total {
-    font-size: 30px;
-    margin-top: 15px;
+    font-size: 26px;
+    margin-top: 10px;
+    text-align: center;
 }
+
 input {
     padding: 10px;
     font-size: 18px;
-    width: 60%;
+    width: 100%;
+    border-radius: 8px;
+    border: none;
     text-align: center;
 }
-.config {
-    background-color: #444;
+
+.lista {
+    background-color: #222;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 10px;
+    min-height: 60px;
 }
+
 .hidden {
     display: none;
+}
+
+@media (min-width: 768px) {
+    button {
+        font-size: 20px;
+    }
 }
 </style>
 </head>
 <body>
 
+<div class="container">
+
 <h2>🌽 Negocio de Elotes 🌽</h2>
 
 <div id="ventas">
 
-<button class="producto" onclick="agregar('elote')">🌽 Elote</button>
-<button class="producto" onclick="agregar('esquite')">🥣 Esquite</button>
-<button class="producto" onclick="agregar('patita')">🐷 Patita</button>
-<button class="producto" onclick="agregar('molleja')">🐔 Molleja</button>
+<button class="producto" onclick="agregar('elote','🌽 Elote')">🌽 Elote</button>
+<button class="producto" onclick="agregar('esquite','🥣 Esquite')">🥣 Esquite</button>
+<button class="producto" onclick="agregar('patita','🐷 Patita')">🐷 Patita</button>
+<button class="producto" onclick="agregar('molleja','🐔 Molleja')">🐔 Molleja</button>
 
-<button class="combo" onclick="agregar('combo_chico')">🔥 Combo Chico</button>
-<button class="combo" onclick="agregar('combo_mediano')">🔥 Combo Mediano</button>
+<button class="combo" onclick="agregar('combo_chico','🔥 Combo Chico')">🔥 Combo Chico</button>
+<button class="combo" onclick="agregar('combo_mediano','🔥 Combo Mediano')">🔥 Combo Mediano</button>
+
+<div class="lista">
+<b>Venta actual:</b>
+<div id="listaProductos"></div>
+</div>
 
 <div class="total">
 TOTAL: $<span id="total">0</span>
 </div>
 
 <br>
-Cliente paga:<br>
-<input type="number" id="paga" placeholder="0">
+Cliente paga:
+<input type="number" id="paga" placeholder="0" oninput="calcularCambio()">
 
 <div class="total">
 Cambio: $<span id="cambio">0</span>
 </div>
 
-<button class="control" onclick="calcularCambio()">Calcular Cambio</button>
 <button class="control" onclick="reiniciar()">Reiniciar Venta</button>
 
 <br><br>
@@ -74,6 +113,7 @@ Cambio: $<span id="cambio">0</span>
 </div>
 
 <div id="configuracion" class="hidden">
+
 <h3>Modificar Precios</h3>
 
 Elote: <input type="number" id="precio_elote"><br><br>
@@ -85,6 +125,9 @@ Combo Mediano: <input type="number" id="precio_combo_mediano"><br><br>
 
 <button class="control" onclick="guardarPrecios()">Guardar</button>
 <button class="control" onclick="cerrarConfig()">Cerrar</button>
+
+</div>
+
 </div>
 
 <script>
@@ -99,10 +142,27 @@ let precios = JSON.parse(localStorage.getItem("precios")) || {
 };
 
 let total = 0;
+let venta = {};
 
-function agregar(producto) {
+function agregar(producto, nombre) {
     total += precios[producto];
     document.getElementById("total").innerText = total;
+
+    if (!venta[nombre]) {
+        venta[nombre] = 0;
+    }
+    venta[nombre]++;
+
+    actualizarLista();
+}
+
+function actualizarLista() {
+    let lista = document.getElementById("listaProductos");
+    lista.innerHTML = "";
+
+    for (let item in venta) {
+        lista.innerHTML += venta[item] + " x " + item + "<br>";
+    }
 }
 
 function calcularCambio() {
@@ -113,9 +173,11 @@ function calcularCambio() {
 
 function reiniciar() {
     total = 0;
+    venta = {};
     document.getElementById("total").innerText = 0;
     document.getElementById("paga").value = "";
     document.getElementById("cambio").innerText = 0;
+    actualizarLista();
 }
 
 function mostrarConfig() {
@@ -152,4 +214,9 @@ function guardarPrecios() {
 </script>
 
 </body>
+</html>
+</script>
+
+</body>
+
 </html>
